@@ -1,0 +1,12 @@
+{
+    "contrib.taskDef.prop.version.desc": "Specifies a version of mruby.",
+    "contrib.taskDef.prop.verbose.desc": "Runs in verbose mode",
+    "contrib.taskDef.mrbc.prop.watch.desc": "Runs in background and watches file modification. When a modification detected, recompile files.",
+    "contrib.taskDef.mrbc.prop.output.desc": "Specifies an output folder of compiled result. If omitted, files will be output in the same folder of source files.",
+    "contrib.taskDef.mrbc.prop.debug.desc": "Generates debugging information.",
+    "contrib.taskDef.mrbc.prop.symbol.desc": "Generates output in C language format with specified symbol name.",
+    "contrib.taskDef.mrbc.prop.endian.desc": "Specifies a byte endianness of iseq data.",
+    "contrib.taskDef.mrbc.prop.include.desc": "Specifies a file or a list of files to be included in compilation. Wildcards can be used.",
+    "contrib.taskDef.mrbc.prop.exclude.desc": "Specifies a file or a list of files to be excluded from compilation. Wildcards can be used.",
+    "contrib.taskDef.mruby.prop.file.desc": "Specifies a file to be executed. Both of .rb and .mrb files can be used."
+}

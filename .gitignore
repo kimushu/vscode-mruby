@@ -1,0 +1,6 @@
+out
+node_modules
+.vscode-test/
+*.vsix
+/lib/*
+!/lib/run_as_node.*
