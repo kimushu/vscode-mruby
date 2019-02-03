@@ -152,7 +152,6 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
 
         // Get target js file
         const target = this.context.asAbsolutePath("out/runner/mrbcRunner.js");
-        task.problemMatchers = [MrbcTaskProvider.type];
 
         // Create spec file to pass arguments
         const args: string[] = [];
@@ -160,7 +159,10 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
         args.push("--binary-path", binaryPath);
         if (kind.watch) {
             task.isBackground = true;
+            task.problemMatchers = ["mrbc-watch"];
             args.push("--watch");
+        } else {
+            task.problemMatchers = ["mrbc"];
         }
         if (kind.debug) {
             args.push("-g");
