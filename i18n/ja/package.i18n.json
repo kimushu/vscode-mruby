@@ -1,0 +1,13 @@
+{
+	"contrib.command.mrbviewer.open.title": "mruby: mrbビューワで開く",
+	"contrib.taskDef.prop.version.desc": "mrubyのバージョンを指定します。",
+	"contrib.taskDef.prop.verbose.desc": "詳細出力モードで実行します。",
+	"contrib.taskDef.mrbc.prop.watch.desc": "バックグラウンドで実行し、ファイルの変更を監視します。変更が検知されるたびファイルを再コンパイルします。",
+	"contrib.taskDef.mrbc.prop.output.desc": "コンパイル結果を出力するフォルダを指定します。省略した場合、ソースファイルと同じフォルダに出力されます。",
+	"contrib.taskDef.mrbc.prop.debug.desc": "デバッグ情報を生成します。",
+	"contrib.taskDef.mrbc.prop.symbol.desc": "指定されたシンボル名を用いたC言語形式で出力します。",
+	"contrib.taskDef.mrbc.prop.endian.desc": "iseqデータのバイトエンディアンを指定します。",
+	"contrib.taskDef.mrbc.prop.include.desc": "コンパイルに含めるファイル、またはそのリストを指定します。ワイルドカードも使用できます。",
+	"contrib.taskDef.mrbc.prop.exclude.desc": "コンパイルから除外するファイル、またはそのリストを指定します。ワイルドカードも使用できます。",
+	"contrib.taskDef.mruby.prop.file.desc": "実行するファイルを指定します。.rbファイルおよび.mrbファイルのどちらでも指定可能です。"
+}

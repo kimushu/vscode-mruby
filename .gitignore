@@ -1,6 +1,7 @@
-out
+/out
 node_modules
 .vscode-test/
 *.vsix
 /lib/*
 !/lib/run_as_node.*
+package.nls.*.json

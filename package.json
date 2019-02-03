@@ -8,13 +8,37 @@
     "vscode": "^1.30.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
   ],
   "activationEvents": [
-    "*"
+    "onCommand:mruby.mrbviewer.open",
+    "workspaceContains:*.rb"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "mruby.mrbviewer.open",
+        "title": "%contrib.command.mrbviewer.open.title%"
+      }
+    ],
+    "languages": [
+      {
+        "id": "mrb",
+        "extensions": [
+          ".mrb"
+        ]
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "mruby.mrbviewer.open",
+          "group": "3_compare",
+          "when": "resourceLangId == mrb"
+        }
+      ]
+    },
     "taskDefinitions": [
       {
         "type": "mrbc",
@@ -114,21 +138,41 @@
       {
         "name": "mrbc",
         "fileLocation": "relative",
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "message": 4
-        },
-        "severity": "error"
+        "pattern": "$mrbc",
+        "source": "mrbc"
+      },
+      {
+        "name": "mrbc-watch",
+        "fileLocation": "relative",
+        "pattern": "$mrbc",
+        "source": "mrbc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "^\\[\\d{2}:\\d{2}\\d{2}\\] File change detected"
+          },
+          "endsPattern": {
+            "regexp": "^\\[\\d{2}:\\d{2}\\d{2}\\] Found \\d+ errors?"
+          }
+        }
+      }
+    ],
+    "problemPatterns": [
+      {
+        "name": "mrbc",
+        "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
+        "file": 1,
+        "line": 2,
+        "column": 3,
+        "message": 4
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
+    "vscode:prepublish": "yarn run localize",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "localize": "gulp build",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "yarn run compile && node ./node_modules/vscode/bin/test"
   },
@@ -142,9 +186,17 @@
     "@types/sprintf-js": "^1.1.1",
     "@types/tar": "^4.0.0",
     "@types/tempy": "^0.2.0",
+    "del": "^3.0.0",
+    "event-stream": "3.3.4",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "^5.0.0",
+    "run-sequence": "^2.2.1",
     "tslint": "^5.8.0",
     "typescript": "^3.1.4",
-    "vscode": "^1.1.25"
+    "vsce": "^1.55.0",
+    "vscode": "^1.1.25",
+    "vscode-nls-dev": "^3.2.3"
   },
   "dependencies": {
     "chokidar": "^2.0.4",
@@ -154,6 +206,7 @@
     "lzma": "^2.3.2",
     "sprintf-js": "^1.1.2",
     "tar": "^4.4.8",
-    "tempy": "^0.2.1"
+    "tempy": "^0.2.1",
+    "vscode-nls": "^4.0.0"
   }
 }

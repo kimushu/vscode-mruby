@@ -5,6 +5,8 @@ import * as fs from "fs-extra";
 import { PassThrough } from "stream";
 import { MrubyVersion } from "./versions";
 import * as vscode from "vscode";
+import * as nls from "vscode-nls";
+const localize = nls.loadMessageBundle();
 const lzma = require("lzma");
 
 const RAW_URL_BASE = "https://github.com/kimushu/vscode-mruby/raw/binary";
@@ -34,7 +36,7 @@ export async function prepareBinary(version: MrubyVersion, name: string): Promis
             await vscode.window.withProgress({
                 cancellable: false,
                 location: vscode.ProgressLocation.Window,
-                title: `Downloading mruby ${version} ...`
+                title: localize("downloading-mruby-x", "Downloading mruby $1 ...", version)
             }, async (progress) => {
                 archiveData = await download(`${RAW_URL_BASE}/${version}/${path.basename(archivePath)}`);
                 if (KEEP_DOWNLOADED_ARCHIVE) {
@@ -48,7 +50,7 @@ export async function prepareBinary(version: MrubyVersion, name: string): Promis
         await vscode.window.withProgress({
             cancellable: false,
             location: vscode.ProgressLocation.Window,
-            title: `Unpacking mruby ${version} ...`
+            title: localize("unpacking-mruby-x", "Unpacking mruby $1 ...", version)
         }, async (progress) => {
             const stream = new PassThrough;
             stream.end(await new Promise<Buffer>((resolve, reject) => {
