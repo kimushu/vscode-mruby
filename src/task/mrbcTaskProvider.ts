@@ -2,7 +2,6 @@ import {
     CancellationToken,
     ExtensionContext,
     ProcessExecution,
-    ProviderResult,
     Task,
     TaskDefinition,
     TaskProvider,
@@ -10,13 +9,14 @@ import {
     Disposable,
     tasks
 } from "vscode";
-import { MrubyVersion } from "../versions";
+import { MrubyVersion, MrubyVersions } from "../versions";
 import * as tempy from "tempy";
 import * as fs from "fs";
 import { createHash } from "crypto";
 import * as path from "path";
 import * as glob from "glob";
 import { promisify } from "util";
+import { prepareBinary } from "../prepare";
 
 export type MrbcEndianness = "little" | "big";
 
@@ -92,7 +92,8 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
     {
         const kinds: TaskDefinition[] = (workspace.getConfiguration("tasks").get("tasks") || []);
         const relatedKinds: MrbcTaskDefinition[] = kinds.filter((kind) => kind.type === MrbcTaskProvider.type);
-        return relatedKinds.map((kind) => {
+        const tasks: Task[] = [];
+        for (let kind of relatedKinds) {
             const options: String[] = [];
             if (kind.watch) {
                 options.push("Watch mode");
@@ -107,12 +108,13 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
                 options.push(`${kind.endian.replace(/^./, (c) => c.toUpperCase())} endian`);
             }
             const info = (options.length > 0) ? ` (${options.join(", ")})` : "";
-            return this.resolveTask(new Task(
+            tasks.push(await this.resolveTask(new Task(
                 kind,
                 `Compile with mruby${info}`,
                 "mruby"
-            ), token) as Task;
-        });
+            )));
+        }
+        return tasks;
     }
 
     /**
@@ -128,27 +130,34 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
      * @param token A cancellation token.
      * @return The resolved task
      */
-    resolveTask(task: Task, token?: CancellationToken): ProviderResult<Task>
+    async resolveTask(task: Task, token?: CancellationToken): Promise<Task>
     {
         if (task.definition.type !== MrbcTaskProvider.type) {
-            return;
+            return Promise.resolve<any>(undefined);
         }
 
         if (task.execution) {
-            console.log("task.execution exists", task.execution);
-            return;
+            return task;
         }
+
+        // Fix mruby version
+        const kind = task.definition as MrbcTaskDefinition;
+        let { version } = kind;
+        if (!version) {
+            version = MrubyVersions[MrubyVersions.length - 1];
+        }
+
+        // Prepare prebuilt binaries
+        const binaryPath = await prepareBinary(version, "mrbc");
 
         // Get target js file
         const target = this.context.asAbsolutePath("out/runner/mrbcRunner.js");
         task.problemMatchers = [MrbcTaskProvider.type];
 
         // Create spec file to pass arguments
-        const kind = task.definition as MrbcTaskDefinition;
         const args: string[] = [];
-        if (kind.version) {
-            args.push("--mruby-version", kind.version);
-        }
+        args.push("--mruby-version", version);
+        args.push("--binary-path", binaryPath);
         if (kind.watch) {
             task.isBackground = true;
             args.push("--watch");
@@ -157,7 +166,7 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
             args.push("-g");
         }
         if (kind.symbol) {
-            args.push(`-B${kind.symbol}`)
+            args.push(`-B${kind.symbol}`);
         }
         if (kind.endian === "little") {
             args.push("-e");
@@ -182,6 +191,7 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
         } else if (kind.exclude) {
             args.push("--exclude", kind.exclude);
         }
+
         const spec = args.join("\n");
         const specFile = path.join(
             this.tempDir,
@@ -206,6 +216,7 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
         task.execution = new ProcessExecution(
             runner, [process.argv0, target, `@-${specFile}`]
         );
+
         return task;
     }
 }

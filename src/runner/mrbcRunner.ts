@@ -14,12 +14,26 @@ const DEFAULT_WATCH_DELAY_MS = 1000;
  */
 interface MrbcRunnerOptions {
     mruby_version?: string;
+    binary_path: string;
     watch: boolean;
     watch_delay_ms: number;
     output?: string;
     include: string[];
     exclude: string[];
     others: string[];
+}
+
+/**
+ * Make number-indicating text with singular or plural form in English
+ * @param value A number
+ * @param word The base of word
+ */
+function plural(value: number, word: string): string {
+    if (value === 1) {
+        return `${value} ${word}`;
+    } else {
+        return `${value} ${word}s`;
+    }
 }
 
 /**
@@ -31,8 +45,8 @@ class MrbcRunner {
      * @param args List of options (excludes node itself and script path)
      */
     constructor(args: string[]) {
-        console.log("const:", args);
         this.options = {
+            binary_path: "mrbc",
             watch: false,
             watch_delay_ms: DEFAULT_WATCH_DELAY_MS,
             include: [],
@@ -44,28 +58,13 @@ class MrbcRunner {
             // Use latest version
             this.options.mruby_version = MrubyVersions[MrubyVersions.length - 1];
         }
-        console.log("opt:", this.options);
-        const binaryPath = path.join(
-            __dirname, "..", "..", "lib", this.options.mruby_version,
-            process.platform, process.arch, "mrbc"
-        );
-        if (process.platform === "win32") {
-            this.binaryPath = binaryPath + ".exe";
-        } else {
-            this.binaryPath = binaryPath;
-            const { mode } = fs.statSync(binaryPath);
-            if ((mode & 0o111) !== 0o111) {
-                // Add executable permission
-                fs.chmodSync(binaryPath, mode | 0o111);
-            }
-        }
     }
 
     /**
      * Start runner.
      */
     async start(): Promise<void> {
-        await this.invoke();
+        await this.invoke(undefined, true);
         if (this.options.watch) {
             this.watch();
         }
@@ -78,9 +77,9 @@ class MrbcRunner {
      */
     private log(format: string, ...args: any[]): void {
         const now = new Date();
-        console.log(
+        process.stdout.write(
             sprintf("[%02d:%02d:%02d] ", now.getHours(), now.getMinutes(), now.getSeconds()) +
-            sprintf(format, ...args)
+            sprintf(format, ...args) + "\n"
         );
     }
 
@@ -103,9 +102,8 @@ class MrbcRunner {
                     }
                     const targets = pending;
                     pending = [];
-                    this.log(`File change detected (${targets.length} file${targets.length !== 1 ? "s" : ""}). Start compilation...`);
-                    const errors = await this.invoke();
-                    this.log(`Found ${errors} error${errors !== 1 ? "s" : ""}. Watching for file changes.`);
+                    this.log(`File change detected (${plural(targets.length, "file")}). Start compilation...`);
+                    await this.invoke(targets, true);
                 });
             }, this.options.watch_delay_ms);
         });
@@ -116,7 +114,7 @@ class MrbcRunner {
      * @param files Files to be compiled (if omitted, options.include used)
      * @returns number of errors detected
      */
-    private async invoke(files?: string[]): Promise<number> {
+    private async invoke(files?: string[], watch?: boolean): Promise<number> {
         if (!files) {
             // Search source files
             files = [];
@@ -125,7 +123,6 @@ class MrbcRunner {
                 files.push(...found);
             }
         }
-        console.log("files:", files);
 
         let errors = 0;
         for (let file of files) {
@@ -143,12 +140,13 @@ class MrbcRunner {
             }
 
             // Invoke process
-            console.log("pre:", ["-o", outputPath, ...this.options.others, file]);
             const child = spawn(
-                this.binaryPath,
+                this.options.binary_path,
                 ["-o", outputPath, ...this.options.others, file],
-                { stdio: ["ignore", "inherit", "inherit"] }
+                { stdio: ["ignore", "pipe", "pipe"] }
             );
+            child.stdout.on("data", (chunk) => process.stdout.write(chunk));
+            child.stderr.on("data", (chunk) => process.stderr.write(chunk));
 
             // Wait for completion
             await new Promise<void>((resolve) => {
@@ -159,6 +157,10 @@ class MrbcRunner {
                     resolve();
                 });
             });
+        }
+
+        if (watch) {
+            this.log(`Found ${plural(errors, "error")}. Watching for file changes.`);
         }
         return errors;
     }
@@ -183,6 +185,9 @@ class MrbcRunner {
             switch (arg) {
             case "--mruby-version":
                 this.options.mruby_version = args[++index];
+                break;
+            case "--binary-path":
+                this.options.binary_path = args[++index];
                 break;
             case "--watch":
                 this.options.watch = true;
@@ -221,7 +226,6 @@ class MrbcRunner {
     }
 
     private options: MrbcRunnerOptions;
-    private binaryPath: string;
     private watcher?: chokidar.FSWatcher;
     private timer?: NodeJS.Timer;
 }
