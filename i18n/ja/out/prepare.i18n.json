@@ -1,4 +1,4 @@
 {
-    "downloading-mruby-x": "mruby $1 をダウンロード中…",
-    "unpacking-mruby-x": "mruby $1 を展開中…"
+    "downloading-mruby-x": "mruby {0} をダウンロード中…",
+    "unpacking-mruby-x": "mruby {0} を展開中…"
 }

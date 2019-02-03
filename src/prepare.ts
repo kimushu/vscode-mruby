@@ -36,7 +36,7 @@ export async function prepareBinary(version: MrubyVersion, name: string): Promis
             await vscode.window.withProgress({
                 cancellable: false,
                 location: vscode.ProgressLocation.Window,
-                title: localize("downloading-mruby-x", "Downloading mruby $1 ...", version)
+                title: localize("downloading-mruby-x", "Downloading mruby {0} ...", version)
             }, async (progress) => {
                 archiveData = await download(`${RAW_URL_BASE}/${version}/${path.basename(archivePath)}`);
                 if (KEEP_DOWNLOADED_ARCHIVE) {
@@ -50,7 +50,7 @@ export async function prepareBinary(version: MrubyVersion, name: string): Promis
         await vscode.window.withProgress({
             cancellable: false,
             location: vscode.ProgressLocation.Window,
-            title: localize("unpacking-mruby-x", "Unpacking mruby $1 ...", version)
+            title: localize("unpacking-mruby-x", "Unpacking mruby {0} ...", version)
         }, async (progress) => {
             const stream = new PassThrough;
             stream.end(await new Promise<Buffer>((resolve, reject) => {
