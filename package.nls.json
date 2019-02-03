@@ -1,4 +1,5 @@
 {
+    "contrib.command.mrbviewer.open.title": "mruby: Open in mrb viewer",
     "contrib.taskDef.prop.version.desc": "Specifies a version of mruby.",
     "contrib.taskDef.prop.verbose.desc": "Runs in verbose mode",
     "contrib.taskDef.mrbc.prop.watch.desc": "Runs in background and watches file modification. When a modification detected, recompile files.",

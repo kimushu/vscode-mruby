@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as chokidar from "chokidar";
 import { sprintf } from "sprintf-js";
 import * as path from "path";
@@ -125,19 +125,23 @@ class MrbcRunner {
         }
 
         let errors = 0;
+        const suffix = this.options.others.find((opt) => opt.startsWith("-B")) ? ".c" : ".mrb";
         for (let file of files) {
             // Generate output path
             let replaced = false;
             let outputPath = file.replace(/\.rb$/i, () => {
                 replaced = true;
-                return ".mrb";
+                return suffix;
             });
             if (!replaced) {
-                outputPath = `${file}.mrb`;
+                outputPath = `${file}${suffix}`;
             }
             if (this.options.output) {
                 outputPath = path.join(this.options.output, outputPath);
             }
+
+            // Ensure output directory
+            fs.ensureDirSync(path.dirname(outputPath));
 
             // Invoke process
             const child = spawn(

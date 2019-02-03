@@ -4,6 +4,11 @@
   "description": "mruby support for VSCode (Lightweight implementation of Ruby language)",
   "version": "0.0.1",
   "publisher": "kimushu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kimushu/vscode-mruby.git"
+  },
   "engines": {
     "vscode": "^1.30.0"
   },
@@ -34,7 +39,7 @@
       "explorer/context": [
         {
           "command": "mruby.mrbviewer.open",
-          "group": "3_compare",
+          "group": "extension",
           "when": "resourceLangId == mrb"
         }
       ]
@@ -174,7 +179,8 @@
     "watch": "tsc -watch -p ./",
     "localize": "gulp build",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "yarn run compile && node ./node_modules/vscode/bin/test"
+    "test": "yarn run compile && node ./node_modules/vscode/bin/test",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/chokidar": "^1.7.5",
@@ -200,6 +206,7 @@
   },
   "dependencies": {
     "chokidar": "^2.0.4",
+    "dedent": "^0.7.0",
     "download": "^7.1.0",
     "fs-extra": "^7.0.1",
     "glob": "^7.1.3",
