@@ -4,7 +4,8 @@
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
 	"version": "0.2.0",
-	"configurations": [{
+	"configurations": [
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
@@ -15,7 +16,27 @@
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
 			],
-			"preLaunchTask": "npm: watch"
+			"preLaunchTask": "npm: watch",
+			"env": {
+				"DEBUG_SERVER_PORT": "4711"
+			}
+		},
+		{
+			"name": "Run Server",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/src/debug/adapter.ts",
+			"args": [
+				"--server=4711"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			],
+			"env": {
+				"ELECTRON_RUN_AS_NODE": "1"
+			}
 		},
 		{
 			"name": "Extension Tests",
@@ -30,6 +51,12 @@
 				"${workspaceFolder}/out/test/**/*.js"
 			],
 			"preLaunchTask": "npm: watch"
+		}
+	],
+	"compounds": [
+		{
+			"name": "Extension & Server",
+			"configurations": ["Run Extension", "Run Server"]
 		}
 	]
 }
