@@ -1,16 +1,20 @@
+/*
+ * Do not use "vscode" module in this file!
+ */
 import * as download from "download";
 import * as tar from "tar";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { PassThrough } from "stream";
 import { MrubyVersion } from "./versions";
-import * as vscode from "vscode";
+const lzma = require("lzma");
 import * as nls from "vscode-nls";
 const localize = nls.loadMessageBundle();
-const lzma = require("lzma");
 
 const RAW_URL_BASE = "https://github.com/kimushu/vscode-mruby/raw/binary";
 const KEEP_DOWNLOADED_ARCHIVE = true;
+
+type PrepareProgress = (title: string, task: () => Promise<void>) => Promise<void>;
 
 /**
  * Prepare platform dependent binary
@@ -18,7 +22,7 @@ const KEEP_DOWNLOADED_ARCHIVE = true;
  * @param name Name of binary ("mruby", "mrbc", etc.) without extensions
  * @returns The full path of the binary
  */
-export async function prepareBinary(version: MrubyVersion, name: string): Promise<string> {
+export async function prepareBinary<T>(version: MrubyVersion, name: string, progress: PrepareProgress): Promise<string> {
     const baseDir = path.join(__dirname, "..", "lib", version);
     let fullPath = path.join(baseDir, process.platform, process.arch, name);
     if (process.platform === "win32") {
@@ -33,11 +37,7 @@ export async function prepareBinary(version: MrubyVersion, name: string): Promis
             archiveData = await fs.readFile(archivePath);
         } else {
             // Archive does not exist
-            await vscode.window.withProgress({
-                cancellable: false,
-                location: vscode.ProgressLocation.Window,
-                title: localize("downloading-mruby-x", "Downloading mruby {0} ...", version)
-            }, async (progress) => {
+            await progress(localize("downloading-mruby-x", version), async () => {
                 archiveData = await download(`${RAW_URL_BASE}/${version}/${path.basename(archivePath)}`);
                 if (KEEP_DOWNLOADED_ARCHIVE) {
                     await fs.ensureDir(path.dirname(archivePath));
@@ -47,11 +47,7 @@ export async function prepareBinary(version: MrubyVersion, name: string): Promis
         }
 
         // Unpack archive
-        await vscode.window.withProgress({
-            cancellable: false,
-            location: vscode.ProgressLocation.Window,
-            title: localize("unpacking-mruby-x", "Unpacking mruby {0} ...", version)
-        }, async (progress) => {
+        await progress(localize("unpacking-mruby-x", version), async () => {
             const stream = new PassThrough;
             stream.end(await new Promise<Buffer>((resolve, reject) => {
                 lzma.decompress(archiveData, (result: number[], error?: Error) => {

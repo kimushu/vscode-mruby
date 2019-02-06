@@ -5,7 +5,7 @@ import * as path from "path";
 import * as glob from "glob";
 import { promisify } from "util";
 import { spawn } from "child_process";
-import { MrubyVersions } from "../versions";
+import { MRUBY_LATEST_VERSION } from "../versions";
 
 const DEFAULT_WATCH_DELAY_MS = 1000;
 
@@ -56,7 +56,7 @@ class MrbcRunner {
         this.parseOptions(args);
         if (!this.options.mruby_version) {
             // Use latest version
-            this.options.mruby_version = MrubyVersions[MrubyVersions.length - 1];
+            this.options.mruby_version = MRUBY_LATEST_VERSION;
         }
     }
 

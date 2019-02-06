@@ -7,9 +7,11 @@ import {
     TaskProvider,
     workspace,
     Disposable,
-    tasks
+    tasks,
+    window,
+    ProgressLocation
 } from "vscode";
-import { MrubyVersion, MrubyVersions } from "../versions";
+import { MrubyVersion, MRUBY_LATEST_VERSION } from "../versions";
 import * as tempy from "tempy";
 import * as fs from "fs";
 import { createHash } from "crypto";
@@ -144,11 +146,17 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
         const kind = task.definition as MrbcTaskDefinition;
         let { version } = kind;
         if (!version) {
-            version = MrubyVersions[MrubyVersions.length - 1];
+            version = MRUBY_LATEST_VERSION;
         }
 
         // Prepare prebuilt binaries
-        const binaryPath = await prepareBinary(version, "mrbc");
+        const binaryPath = await prepareBinary(version, "mrbc", (title, task) => {
+            return Promise.resolve(window.withProgress({
+                location: ProgressLocation.Window, title
+            }, () => {
+                return task();
+            }).then(() => {}));
+        });
 
         // Get target js file
         const target = this.context.asAbsolutePath("out/runner/mrbcRunner.js");
