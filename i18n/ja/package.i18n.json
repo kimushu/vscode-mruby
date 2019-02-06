@@ -1,7 +1,10 @@
 {
+	"contrib.common.version.desc": "mrubyのバージョンを指定します。",
+	"contrib.common.verbose.desc": "詳細出力モードで実行します。",
 	"contrib.command.mrbviewer.open.title": "mruby: mrbビューワで開く",
-	"contrib.taskDef.prop.version.desc": "mrubyのバージョンを指定します。",
-	"contrib.taskDef.prop.verbose.desc": "詳細出力モードで実行します。",
+	"contrib.debug.mruby.label": "mruby (軽量Ruby)",
+	"contrib.debug.mruby.configAttr.launch.program.desc": "実行するプログラムのファイル名。'*.rb'ファイルと'*.mrb'ファイルのどちらでも指定できます。\n'*.mrb'を指定した場合は、実行前にコンパイルが実行されるよう'preLaunchTask'に適切なタスクを設定することを推奨します。",
+	"contrib.debug.mirb.label": "mirb (対話型シェル付きのmruby)",
 	"contrib.taskDef.mrbc.prop.watch.desc": "バックグラウンドで実行し、ファイルの変更を監視します。変更が検知されるたびファイルを再コンパイルします。",
 	"contrib.taskDef.mrbc.prop.output.desc": "コンパイル結果を出力するフォルダを指定します。省略した場合、ソースファイルと同じフォルダに出力されます。",
 	"contrib.taskDef.mrbc.prop.debug.desc": "デバッグ情報を生成します。",

@@ -1,7 +1,11 @@
 {
+    "contrib.common.version.desc": "Specifies a version of mruby.",
+    "contrib.common.verbose.desc": "Runs in verbose mode",
     "contrib.command.mrbviewer.open.title": "mruby: Open in mrb viewer",
-    "contrib.taskDef.prop.version.desc": "Specifies a version of mruby.",
-    "contrib.taskDef.prop.verbose.desc": "Runs in verbose mode",
+    "contrib.debug.mrdb.label": "mruby (Lightweight Ruby) with debugger",
+	"contrib.debug.mrdb.configAttr.launch.program.desc": "Specifies a program file name ('.rb') to debug.",
+    "contrib.debug.mruby.label": "mruby (Lightweight Ruby)",
+	"contrib.debug.mruby.configAttr.launch.program.desc": "Specifies a program file name to run. Both of '.rb' and '.mrb' file are accepted.\nIf '.mrb' is used, it recommended to set 'preLaunchTask' to a correct task to ensure compilation before launch.",
     "contrib.taskDef.mrbc.prop.watch.desc": "Runs in background and watches file modification. When a modification detected, recompile files.",
     "contrib.taskDef.mrbc.prop.output.desc": "Specifies an output folder of compiled result. If omitted, files will be output in the same folder of source files.",
     "contrib.taskDef.mrbc.prop.debug.desc": "Generates debugging information.",

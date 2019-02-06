@@ -1,0 +1,5 @@
+{
+    "cannot-find-program": "デバッグするプログラムが見つかりません",
+    "mrdb.launch.config.name": "mrubyデバッガで実行",
+    "mruby.launch.config.name": "mrubyで実行"
+}

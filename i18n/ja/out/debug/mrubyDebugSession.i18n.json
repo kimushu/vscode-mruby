@@ -1,0 +1,5 @@
+{
+    "x-process-started-with-pid-n": "{0}プロセスが開始されました。(pid: {1})",
+    "x-process-finished-successfully": "{0}プロセスが正常に終了しました。",
+    "x-process-aborted-with-code-n": "{0}プロセスがコード {1} で異常終了しました。"
+}
