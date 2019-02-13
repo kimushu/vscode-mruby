@@ -1,34 +1,24 @@
 import { Runtime } from "./runtime";
-import { MrubyLaunchRequestArguments } from "./mrubyDebugSession";
-import { EventEmitter } from "events";
-import { spawn, ChildProcess } from "child_process";
+import { MrubyDebugSession, MrubyLaunchRequestArguments } from "./mrubyDebugSession";
+import { DebugProtocol } from "vscode-debugprotocol";
+import { ChildProcess } from "child_process";
 
-export class MrubyRuntime extends EventEmitter implements Runtime {
-    static readonly binaryName: string = "mruby";
-    protected cp: ChildProcess;
+export class MrubyRuntime implements Runtime {
+    readonly binaryName: string = "mruby";
+    readonly spawnArgs: string[];
+    private cp?: ChildProcess;
 
-    constructor(readonly launchArgs: MrubyLaunchRequestArguments, binaryPath: string) {
-        super();
-
-        this.cp = spawn(binaryPath, [], { stdio: "pipe" });
-        if (!this.cp.pid) {
-            throw new Error(`Cannot spawn process: "${binaryPath}"`);
-        }
-        this.emitAfter("start", new.target.binaryName, this.cp.pid);
-        this.cp.on("exit", (code) => {
-            this.emitAfter("exit", new.target.binaryName, code);
-        });
-        this.cp.stdout.on("data", (chunk: Buffer) => {
-            this.emitAfter("stdout", chunk);
-        });
-        this.cp.stderr.on("data", (chunk: Buffer) => {
-            this.emitAfter("stderr", chunk);
-        });
+    constructor(readonly debugSession: MrubyDebugSession, readonly launchArgs: MrubyLaunchRequestArguments) {
+        this.spawnArgs = (launchArgs.verbose ? ["-v"] : []).concat(launchArgs.program);
     }
 
-    protected emitAfter(event: string, ...args: any[]) {
-        setImmediate(() => {
-            this.emit(event, ...args);
-        });
+    async launchRequest(response: DebugProtocol.LaunchResponse, args: DebugProtocol.LaunchRequestArguments): Promise<void> {
+        this.cp = this.debugSession.childProcess;
+        if (!this.cp) {
+            throw new Error("No mruby process");
+        }
+        this.cp.stdin.end();
+        this.cp.stdout.on("data", (chunk) => this.debugSession.sendOutputEvent(chunk, "stdout"));
+        this.cp.stderr.on("data", (chunk) => this.debugSession.sendOutputEvent(chunk, "stderr"));
     }
 }

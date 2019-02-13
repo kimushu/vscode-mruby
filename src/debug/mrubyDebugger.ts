@@ -18,18 +18,22 @@ import * as nls from "vscode-nls";
 const localize = nls.loadMessageBundle();
 import * as path from "path";
 import * as net from "net";
-import { MrubyDebugSession } from "./mrubyDebugSession";
 import { MRUBY_LATEST_VERSION } from "../versions";
+import { MrubyDebugSession } from "./mrubyDebugSession";
 export type MrubyDebugType = "mrdb" | "mruby";
 
 export class MrubyDebugger implements DebugConfigurationProvider {
+    /**
+     * Activate debug features.
+     * @param context A context of extension
+     */
     static activate(context: ExtensionContext) {
         const debugTypes: MrubyDebugType[] = ["mrdb", "mruby"];
         const factory = new MrubyDebugAdapterDescriptorFactory();
-        debugTypes.forEach((debugType) => {
+        debugTypes.forEach((type) => {
             context.subscriptions.push(
-                debug.registerDebugConfigurationProvider(debugType, new this(debugType)),
-                debug.registerDebugAdapterDescriptorFactory(debugType, factory)
+                debug.registerDebugConfigurationProvider(type, new this(type)),
+                debug.registerDebugAdapterDescriptorFactory(type, factory)
             );
         });
         context.subscriptions.push(factory);
@@ -165,6 +169,9 @@ class MrubyDebugAdapterDescriptorFactory implements DebugAdapterDescriptorFactor
         return new DebugAdapterServer(this.server.address().port);
     }
 
+    /**
+     * Dispose object.
+     */
     dispose() {
         if (this.server) {
             this.server.close();

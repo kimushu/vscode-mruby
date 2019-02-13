@@ -1,12 +1,13 @@
-import { DebugSession, TerminatedEvent, OutputEvent, InitializedEvent, StoppedEvent } from "vscode-debugadapter";
+import { DebugSession, TerminatedEvent, OutputEvent, InitializedEvent } from "vscode-debugadapter";
 import { DebugProtocol } from "vscode-debugprotocol";
 import { prepareBinary } from "../prepare";
 import { MrubyVersion, MRUBY_LATEST_VERSION } from "../versions";
+import { spawn, ChildProcess } from "child_process";
 import * as nls from "vscode-nls";
-const localize = nls.loadMessageBundle();
-import { Runtime, RuntimeClass as RuntimeConstructor } from "./runtime";
+import { Runtime } from "./runtime";
 import { MrdbRuntime } from "./mrdbRuntime";
 import { MrubyRuntime } from "./mrubyRuntime";
+const localize = nls.loadMessageBundle();
 
 export interface MrubyLaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
     type: "mrdb" | "mruby";
@@ -16,9 +17,10 @@ export interface MrubyLaunchRequestArguments extends DebugProtocol.LaunchRequest
 }
 
 export class MrubyDebugSession extends DebugSession {
+    public childProcess?: ChildProcess;
     private runtime?: Runtime;
 
-    protected output(message: string | Buffer, category: string = "console") {
+    sendOutputEvent(message: string | Buffer, category: string = "console") {
         if (message instanceof Buffer) {
             message = new Buffer(message).toString();
         }
@@ -36,69 +38,57 @@ export class MrubyDebugSession extends DebugSession {
             if (!args.mrubyVersion) {
                 args.mrubyVersion = MRUBY_LATEST_VERSION;
             }
-
-            let runtimeConstructor: RuntimeConstructor | undefined;
             switch (args.type) {
-            case "mrdb":
-                runtimeConstructor = MrdbRuntime;
-                break;
             case "mruby":
-                runtimeConstructor = MrubyRuntime;
+                this.runtime = new MrubyRuntime(this, args);
                 break;
-            }
-
-            if (!runtimeConstructor) {
+            case "mrdb":
+                this.runtime = new MrdbRuntime(this, args);
+                break;
+            default:
                 throw new Error(`Unknown debug type: ${args.type}`);
             }
 
             const binaryPath = await prepareBinary(
-                args.mrubyVersion, runtimeConstructor.binaryName, (title, task) => {
+                args.mrubyVersion, this.runtime.binaryName, (title, task) => {
                     this.sendEvent(new OutputEvent(title + "\n", "console"));
                     return task();
                 }
             );
 
-            this.runtime = new runtimeConstructor(args, binaryPath);
-
-            this.runtime.on("start", (processName, pid) => {
-                this.sendEvent(new OutputEvent(
-                    localize("x-process-started-with-pid-n",
-                        "{0} process started (pid: ${1})",
-                        processName, pid) + "\n",
-                    "console"
-                ));
-            });
-
-            this.runtime.on("exit", (processName, code) => {
+            this.childProcess = spawn(binaryPath, this.runtime.spawnArgs, { stdio: "pipe" });
+            if (!this.childProcess.pid) {
+                throw new Error(`Cannot invoke debug process: ${binaryPath}`);
+            }
+            this.sendOutputEvent(
+                localize("x-process-started-with-pid-n",
+                    "{0} process started (pid: {1})",
+                    this.runtime.binaryName, this.childProcess.pid) + "\n",
+                "console"
+            );
+            this.childProcess.on("exit", (code) => {
                 if (code === 0) {
-                    this.sendEvent(new OutputEvent(
+                    this.sendOutputEvent(
                         localize(
                             "x-process-finished-successfully",
                             "{0} process finished successfully",
-                            processName) + "\n",
+                            this.runtime!.binaryName) + "\n",
                         "console"
-                    ));
+                    );
                 } else {
-                    this.sendEvent(new OutputEvent(
+                    this.sendOutputEvent(
                         localize(
                             "x-process-aborted-with-code-n",
                             "{0} process aborted with code {1}",
-                            processName, code) + "\n",
+                            this.runtime!.binaryName, code) + "\n",
                         "console"
-                    ));
+                    );
                 }
                 this.sendEvent(new TerminatedEvent());
             });
-
-            for (let stream of ["stdout", "stderr", "console"]) {
-                this.runtime.on(<any>stream, (chunk) => {
-                    this.sendEvent(new OutputEvent(chunk, stream));
-                });
+            if (this.runtime.launchRequest) {
+                return this.runtime.launchRequest(response, args);
             }
-
-            this.runtime.on("stop", (reason) => {
-                this.sendEvent(new StoppedEvent(reason));
-            });
         }).then(() => {
             this.sendResponse(response);
         }).catch((reason) => {
@@ -106,15 +96,51 @@ export class MrubyDebugSession extends DebugSession {
         });
     }
 
-    protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
-        if (this.runtime && this.runtime.getStackTrace) {
-            this.runtime.getStackTrace(response).then(() => {
-                this.sendResponse(response);
-            }).catch((reason) => {
-                this.sendErrorResponse(response, 1001, `${reason}`);
-            });
-        } else {
+    protected transferRequest(requestName: keyof Runtime, response: DebugProtocol.Response, ...args: any[]): void {
+        Promise.resolve().then(() => {
+            if (!this.runtime) {
+                throw new Error("No runtime instance");
+            }
+            const req: Function = <any>this.runtime[requestName];
+            if (req) {
+                return req.call(this.runtime, response, ...args);
+            }
+        }).then(() => {
             this.sendResponse(response);
-        }
+        }).catch((reason) => {
+            this.sendErrorResponse(response, 1000, `${reason}`);
+        });
+    }
+
+    threadsRequest(response: DebugProtocol.ThreadsResponse): void {
+        this.transferRequest("threadsRequest", response);
+    }
+
+    stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
+        this.transferRequest("stackTraceRequest", response, args);
+    }
+
+    scopesRequest(response: DebugProtocol.ScopesResponse, args: DebugProtocol.ScopesArguments): void {
+        this.transferRequest("scopesRequest", response, args);
+    }
+
+    nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
+        this.transferRequest("nextRequest", response, args);
+    }
+
+    stepInRequest(response: DebugProtocol.StepInResponse, args: DebugProtocol.StepInArguments): void {
+        this.transferRequest("stepInRequest", response, args);
+    }
+
+    variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments): void {
+        this.transferRequest("variablesRequest", response, args);
+    }
+
+    evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
+        this.transferRequest("evaluateRequest", response, args);
+    }
+
+    convertPath(debuggerPath: string): string {
+        return this.convertDebuggerPathToClient(debuggerPath);
     }
 }
