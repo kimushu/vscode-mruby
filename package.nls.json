@@ -13,5 +13,5 @@
     "contrib.taskDef.mrbc.prop.endian.desc": "Specifies a byte endianness of iseq data.",
     "contrib.taskDef.mrbc.prop.include.desc": "Specifies a file or a list of files to be included in compilation. Wildcards can be used.",
     "contrib.taskDef.mrbc.prop.exclude.desc": "Specifies a file or a list of files to be excluded from compilation. Wildcards can be used.",
-    "contrib.taskDef.mruby.prop.file.desc": "Specifies a file to be executed. Both of .rb and .mrb files can be used."
+    "contrib.taskDef.mruby.prop.file.desc": "Specifies a program file name to be executed. Both of '.rb' and '.mrb' files can be used."
 }
