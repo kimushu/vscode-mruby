@@ -222,10 +222,10 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": {
-            "regexp": "^\\[\\d{2}:\\d{2}\\d{2}\\] File change detected"
+            "regexp": "^\\[\\d{2}:\\d{2}:\\d{2}\\] File change detected"
           },
           "endsPattern": {
-            "regexp": "^\\[\\d{2}:\\d{2}\\d{2}\\] Found \\d+ errors?"
+            "regexp": "^\\[\\d{2}:\\d{2}:\\d{2}\\] Found \\d+ errors?"
           }
         }
       }
