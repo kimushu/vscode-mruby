@@ -1,6 +1,6 @@
 # mruby support for VSCode
 
-[日本語の説明はこちら / Japanese](https://github.com/kimushu/vscode-mruby/blob/master/README-ja.md)
+[日本語の説明はこちら / Japanese](https://github.com/kimushu/vscode-mruby/blob/master/README.ja.md)
 
 This extension provides compiler and runtime of mruby (_Lightweight implementation of Ruby Language_).
 
