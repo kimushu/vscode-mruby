@@ -2,7 +2,7 @@
   "name": "mruby",
   "displayName": "mruby",
   "description": "mruby support for VSCode (Lightweight implementation of Ruby language)",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "kimushu",
   "license": "MIT",
   "repository": {
@@ -16,19 +16,12 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:mruby.mrbviewer.open",
     "onDebug",
     "onDebugInitialConfigurations",
-    "workspaceContains:*.rb"
+    "onLanguage:ruby"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "mruby.mrbviewer.open",
-        "title": "%contrib.command.mrbviewer.open.title%"
-      }
-    ],
     "debuggers": [
       {
         "type": "mrdb",
@@ -36,7 +29,7 @@
         "languages": [
           "ruby"
         ],
-        "program": "./out/debug/mrubySession.js",
+        "program": "./out/debug/adapter.js",
         "runtime": "node",
         "configurationAttributes": {
           "launch": {
@@ -66,7 +59,7 @@
         "languages": [
           "ruby"
         ],
-        "program": "./out/debug/mrubySession.js",
+        "program": "./out/debug/adapter.js",
         "runtime": "node",
         "configurationAttributes": {
           "launch": {
@@ -103,15 +96,6 @@
         ]
       }
     ],
-    "menus": {
-      "explorer/context": [
-        {
-          "command": "mruby.mrbviewer.open",
-          "group": "extension",
-          "when": "resourceLangId == mrb"
-        }
-      ]
-    },
     "taskDefinitions": [
       {
         "type": "mrbc",
