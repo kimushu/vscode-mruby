@@ -1,65 +1,62 @@
-# mruby-compiler README
+# mruby support for VSCode
 
-This is the README for your extension "mruby-compiler". After writing up a brief description, we recommend including the following sections.
+[日本語の説明はこちら / Japanese](https://github.com/kimushu/vscode-mruby/blob/master/README-ja.md)
+
+This extension provides compiler and runtime of mruby (_Lightweight implementation of Ruby Language_).
+
+https://github.com/kimushu/vscode-mruby
+
+## About mruby
+
+See official website: https://www.mruby.org/
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+* Provide tasks for mruby compilation (*.rb &rightarrow; *.mrb)
+    * **mruby compiler is included** in this extension. \
+      You don't need install mruby separately.
+    * **Watch mode** supported. \
+      Automatically re-compile after you changed source code. You don't need to trigger build many times.
+    * **Report compile errors in VSCode**. \
+      When compile errors detected, this extension reports errors on source code and in Problems window.
 
-For example if there is an image subfolder under your extension project workspace:
+* Provide **executing your Ruby code with mruby** in VSCode debug interface.
 
-\!\[feature X\]\(images/feature-x.png\)
+* (Experimental) Provide debugging your Ruby code with mruby debugger ( `mrdb` ) through VSCode debug interface.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Supported mruby versions
 
-## Requirements
+|mruby|RITE binary|RITE VM|Compile support|Execute support|Debug suport|
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|2.0.0|0005|0002|**Yes**|**Yes**|Yes (Experimental)|
+|1.4.1|0004|0000|**Yes**|**Yes**|Yes (Experimental)|
+|1.3.0|0004|0000|No|No|No|
+|1.2.0|0003|0000|No|No|No|
+|1.1.0|0003|0000|No|No|No|
+|1.0.0|0002|0000|No|No|No|
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## How to configure tasks.json
 
-## Extension Settings
+1. Open Ruby source (.rb) in VSCode.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1. Press `F1` and type `Configure Task`. \
+![](https://user-images.githubusercontent.com/1642194/52716366-f4a34a80-2fe1-11e9-9f98-b5a94442103d.png)
 
-For example:
+1. Select `mruby: Compile with mruby` or `mruby: Compile with mruby (Watch mode)` as you prefer. \
+![](https://user-images.githubusercontent.com/1642194/52716215-a2622980-2fe1-11e9-90f4-5bd3e8637e9f.png)
 
-This extension contributes the following settings:
+## How to configure launch.json
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+1. Open Ruby source (.rb) in VSCode.
 
-## Known Issues
+1. Select `Debug` &rightarrow; `Add configuration...` from menu bar. \
+![](https://user-images.githubusercontent.com/1642194/52716548-51066a00-2fe2-11e9-9915-b7b410f8db15.png)
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Select mruby or mruby debugger. \
+![](https://user-images.githubusercontent.com/1642194/52716637-8b700700-2fe2-11e9-868e-02ce59c524fa.png)
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release with experimental debugging support.
