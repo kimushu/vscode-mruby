@@ -37,7 +37,7 @@ export async function prepareBinary<T>(version: MrubyVersion, name: string, prog
             archiveData = await fs.readFile(archivePath);
         } else {
             // Archive does not exist
-            await progress(localize("downloading-mruby-x", version), async () => {
+            await progress(localize("downloading-mruby-x", "Downloading mruby {0}...", version), async () => {
                 archiveData = await download(`${RAW_URL_BASE}/${version}/${path.basename(archivePath)}`);
                 if (KEEP_DOWNLOADED_ARCHIVE) {
                     await fs.ensureDir(path.dirname(archivePath));
@@ -47,7 +47,7 @@ export async function prepareBinary<T>(version: MrubyVersion, name: string, prog
         }
 
         // Unpack archive
-        await progress(localize("unpacking-mruby-x", version), async () => {
+        await progress(localize("unpacking-mruby-x", "Unpacking mruby {0}...", version), async () => {
             const stream = new PassThrough;
             stream.end(await new Promise<Buffer>((resolve, reject) => {
                 lzma.decompress(archiveData, (result: number[], error?: Error) => {
