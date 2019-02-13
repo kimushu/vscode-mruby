@@ -95,6 +95,12 @@ export class MrbcTaskProvider implements TaskProvider, Disposable
         const kinds: TaskDefinition[] = (workspace.getConfiguration("tasks").get("tasks") || []);
         const relatedKinds: MrbcTaskDefinition[] = kinds.filter((kind) => kind.type === MrbcTaskProvider.type);
         const tasks: Task[] = [];
+        if (!relatedKinds.find((kind) => !!kind.watch)) {
+            relatedKinds.push({ type: MrbcTaskProvider.type, watch: true });
+        }
+        if (!relatedKinds.find((kind) => !kind.watch)) {
+            relatedKinds.push({ type: MrbcTaskProvider.type });
+        }
         for (let kind of relatedKinds) {
             const options: String[] = [];
             if (kind.watch) {
