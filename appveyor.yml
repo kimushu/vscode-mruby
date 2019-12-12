@@ -38,4 +38,4 @@ build_script:
     ruby deploy.rb
 
 artifacts:
-- path: '**\*.lzma'
+- path: $(MRUBY_VERSION)\win32-$(MRUBY_ARCH).tar.lzma
