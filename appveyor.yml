@@ -1,23 +1,41 @@
 version: 1.0.{build}
 image: Visual Studio 2015
+
 environment:
-  DEPLOY_KEY:
-    secure: MFTNbgQT5X5G4usi3A3e1hOdMHyClga0+9deZSJT46dYHqem7MQi/4xC7IJrIkeu
+  MRUBY_PLATFORM: win32
   matrix:
   -
-    MRUBY_VERSION: 2.1.0
-    MRUBY_PLATFORM: win32
+    MRUBY_VERSION: 1.4.1
     MRUBY_ARCH: x64
     MRUBY_ARCH_WIN: amd64
-#  -
-#    MRUBY_VERSION: 2.1.0
-#    MRUBY_ARCH_NODE: ia32
-#    MRUBY_ARCH_WIN: x86
+  -
+    MRUBY_VERSION: 1.4.1
+    MRUBY_ARCH: ia32
+    MRUBY_ARCH_WIN: x86
+  -
+    MRUBY_VERSION: 2.0.1
+    MRUBY_ARCH: x64
+    MRUBY_ARCH_WIN: amd64
+  -
+    MRUBY_VERSION: 2.0.1
+    MRUBY_ARCH: ia32
+    MRUBY_ARCH_WIN: x86
+  -
+    MRUBY_VERSION: 2.1.0
+    MRUBY_ARCH: x64
+    MRUBY_ARCH_WIN: amd64
+  -
+    MRUBY_VERSION: 2.1.0
+    MRUBY_ARCH: ia32
+    MRUBY_ARCH_WIN: x86
+
 build_script:
-  - cmd: '
-      set PATH=%PATH%;C:\msys64\usr\bin
-      call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MRUBY_ARCH_WIN%
-      ruby deploy.rb'
+- cmd: >-
+    set PATH=%PATH%;C:\msys64\usr\bin
+
+    call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MRUBY_ARCH_WIN%
+
+    ruby deploy.rb
 
 artifacts:
-  - path: '**\*.lzma'
+- path: '**\*.lzma'
