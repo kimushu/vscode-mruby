@@ -14,12 +14,10 @@ environment:
 #    MRUBY_ARCH_NODE: ia32
 #    MRUBY_ARCH_WIN: x86
 build_script:
-  - cmd: >-
-    set PATH=%PATH%;C:\msys64\usr\bin
-
-    call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MRUBY_ARCH_WIN%
-
-    ruby deploy.rb
+  - cmd: '
+      set PATH=%PATH%;C:\msys64\usr\bin
+      call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MRUBY_ARCH_WIN%
+      ruby deploy.rb'
 
 artifacts:
   - path: '**\*.lzma'
