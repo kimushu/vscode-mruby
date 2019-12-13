@@ -1,0 +1,15 @@
+language: c
+compiler: gcc
+
+os:
+  - linux
+  - osx
+
+env:
+  jobs:
+    - MRUBY_VERSION=1.4.1
+    - MRUBY_VERSION=2.0.1
+    - MRUBY_VERSION=2.1.0
+
+script:
+  - ruby deploy.rb
