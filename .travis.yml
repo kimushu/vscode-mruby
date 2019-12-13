@@ -11,5 +11,10 @@ env:
     - MRUBY_VERSION=2.0.1
     - MRUBY_VERSION=2.1.0
 
+addons:
+  apt:
+    packages:
+    - gcc-multilib
+
 script:
   - ruby deploy.rb
