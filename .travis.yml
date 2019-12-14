@@ -21,7 +21,7 @@ addons:
   apt:
     packages:
     - gcc-multilib
-    - lib32readline7
+    - lib32readline6
     - lib32ncurses5
 
 before_script:
