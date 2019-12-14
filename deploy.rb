@@ -17,9 +17,20 @@ when /darwin|mac os/
   MRUBY_ARCH = "x64"
 when /linux/
   MRUBY_PLATFORM = "linux"
-  MRUBY_ARCH = "x64,ia32"
+  MRUBY_ARCH = "x64" #"x64,ia32"
 else
   abort "Unknown platform: #{HOST_OS}"
+end
+
+SFTP_HOST = ENV["SFTP_HOST"]
+if SFTP_HOST
+  SFTP_PORT = ENV["SFTP_PORT"] || "22"
+  SFTP_USER = ENV["SFTP_USER"]
+  abort "SFTP_USER required" unless SFTP_USER
+  SFTP_IDENTITY = ENV["SFTP_IDENTITY"]
+  abort "SFTP_IDENTITY required" unless SFTP_IDENTITY
+  SFTP_DEST = ENV["SFTP_DEST"]
+  abort "SFTP_DEST required" unless SFTP_DEST
 end
 
 puts "-------- Starting --------"
@@ -35,7 +46,7 @@ FileUtils.makedirs(MRUBY_VERSION)
 exists = MRUBY_ARCH.split(",").all? {|arch| File.exists?("#{make_tar_path(arch)}.lzma") }
 if exists
   puts "skipped (already exists)"
-  exit(0)
+  #exit(0)
 end
 
 unless Dir.exists?("mruby")
@@ -75,9 +86,26 @@ MRUBY_ARCH.split(",").each do |arch|
     end
   end
 
-  puts "-------- Making archive --------"
+  puts "-------- Making archive (#{arch}) --------"
   STDOUT.flush
   abort "tar failed" unless system(*%W[tar cf #{tar_path} -C mruby/build #{MRUBY_PLATFORM}])
   STDOUT.flush
   abort "lzma failed" unless system(*%W[lzma -9 #{tar_path}])
+
+end
+
+if SFTP_HOST
+  MRUBY_ARCH.split(",").each do |arch|
+    puts "-------- Uploading archive (#{arch}) --------"
+    STDOUT.flush
+    IO.popen(%W[sftp -i #{SFTP_IDENTITY} -P #{SFTP_PORT} #{SFTP_USER}@#{SFTP_HOST}], "w") do |io|
+      io.puts("lcd #{MRUBY_VERSION}")
+      io.puts("cd #{SFTP_DEST}")
+      io.puts("mkdir #{MRUBY_VERSION}")
+      io.puts("cd #{MRUBY_VERSION}")
+      io.puts("put #{MRUBY_PLATFORM}-#{arch}.tar.lzma")
+      io.puts("bye")
+      io.close_write
+    end
+  end
 end
