@@ -17,7 +17,7 @@ when /darwin|mac os/
   MRUBY_ARCH = "x64"
 when /linux/
   MRUBY_PLATFORM = "linux"
-  MRUBY_ARCH = "x64" #"x64,ia32"
+  MRUBY_ARCH = "x64,ia32"
 else
   abort "Unknown platform: #{HOST_OS}"
 end
