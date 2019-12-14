@@ -21,8 +21,8 @@ addons:
   apt:
     packages:
     - gcc-multilib
-    - lib32readline6
-    - lib32ncurses5
+    - lib32readline-dev
+    - lib32ncurses5-dev
 
 before_script:
 - openssl aes-256-cbc -K $encrypted_185d3ff9ea72_key -iv $encrypted_185d3ff9ea72_iv -in id_rsa.uploader.enc -out id_rsa.uploader -d
