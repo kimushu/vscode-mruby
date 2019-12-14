@@ -99,8 +99,9 @@ if SFTP_HOST
     puts "-------- Uploading archive (#{arch}) --------"
     STDOUT.flush
     IO.popen(%W[sftp
-      -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
-      -i #{SFTP_IDENTITY} -P #{SFTP_PORT} #{SFTP_USER}@#{SFTP_HOST}], "r+") do |io|
+        -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+        -i #{SFTP_IDENTITY} -P #{SFTP_PORT} #{SFTP_USER}@#{SFTP_HOST}], "w",
+        :out => :close, :err => :close) do |io|
       io.puts("lcd #{MRUBY_VERSION}")
       io.puts("cd #{SFTP_DEST}")
       io.puts("mkdir #{MRUBY_VERSION}")
