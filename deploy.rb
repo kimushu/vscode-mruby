@@ -46,7 +46,7 @@ FileUtils.makedirs(MRUBY_VERSION)
 exists = MRUBY_ARCH.split(",").all? {|arch| File.exists?("#{make_tar_path(arch)}.lzma") }
 if exists
   puts "skipped (already exists)"
-  #exit(0)
+  exit(0)
 end
 
 unless Dir.exists?("mruby")
