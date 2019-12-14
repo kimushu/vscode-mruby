@@ -101,7 +101,7 @@ if SFTP_HOST
     IO.popen(%W[sftp
         -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
         -i #{SFTP_IDENTITY} -P #{SFTP_PORT} #{SFTP_USER}@#{SFTP_HOST}], "w",
-        :out => :close, :err => :close) do |io|
+        :err => :close) do |io|
       io.puts("lcd #{MRUBY_VERSION}")
       io.puts("cd #{SFTP_DEST}")
       io.puts("mkdir #{MRUBY_VERSION}")
