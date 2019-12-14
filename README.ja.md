@@ -28,6 +28,8 @@ https://github.com/kimushu/vscode-mruby
 
 |mruby|RITE binary|RITE VM|Compile support|Execute support|Debug suport|
 |:--:|:--:|:--:|:--:|:--:|:--:|
+|2.1.0|0006|0002|**Yes**|**Yes**|Yes (Experimental)|
+|2.0.1|0005|0002|**Yes**|**Yes**|Yes (Experimental)|
 |2.0.0|0005|0002|**Yes**|**Yes**|Yes (Experimental)|
 |1.4.1|0004|0000|**Yes**|**Yes**|Yes (Experimental)|
 |1.3.0|0004|0000|No|No|No|
