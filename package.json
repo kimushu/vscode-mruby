@@ -1,0 +1,29 @@
+{
+  "version": "1.1.0",
+  "dependencies": {
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.6",
+    "lzma": "^2.3.2",
+    "lzma-native": "^5.0.1",
+    "semver": "^7.1.1",
+    "ssh2": "^0.8.7",
+    "stream-buffers": "^3.0.2",
+    "tar-stream": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.1",
+    "@types/glob": "^7.1.1",
+    "@types/lzma-native": "^4.0.0",
+    "@types/node": "^12.12.21",
+    "@types/semver": "^6.2.0",
+    "@types/ssh2": "^0.5.39",
+    "@types/stream-buffers": "^3.0.3",
+    "@types/tar-stream": "^1.6.1",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4"
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -w -p ."
+  }
+}

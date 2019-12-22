@@ -1,0 +1,7 @@
+{
+    "rules": {
+        "semicolon": true,
+        "triple-equals": true,
+        "no-floating-promises": true
+    }
+}

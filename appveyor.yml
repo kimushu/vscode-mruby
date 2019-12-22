@@ -35,7 +35,6 @@ build_script:
 
     call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MRUBY_ARCH_WIN%
 
-    ruby deploy.rb
+    npm install
 
-artifacts:
-- path: $(MRUBY_VERSION)\win32-$(MRUBY_ARCH).tar.lzma
+    node deploy.js
