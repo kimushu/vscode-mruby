@@ -451,11 +451,15 @@ var Builder = /** @class */ (function () {
                         lzmaData = _k.sent();
                         lzmaSize = lzmaData.byteLength;
                         console.log("Compressed " + tarSize + " -> " + lzmaSize + " bytes");
-                        return [4 /*yield*/, fs_extra_1.writeFile(lzmaPath, lzmaData)];
+                        return [4 /*yield*/, fs_extra_1.ensureDir(path.dirname(lzmaPath))];
                     case 17:
                         _k.sent();
-                        return [4 /*yield*/, fs_extra_1.writeFile(lzmaPath + ".version", EXT_VERSION)];
+                        return [4 /*yield*/, fs_extra_1.writeFile(lzmaPath, lzmaData)];
                     case 18:
+                        _k.sent();
+                        console.log("Creating version info ...");
+                        return [4 /*yield*/, fs_extra_1.writeFile(lzmaPath + ".version", EXT_VERSION)];
+                    case 19:
                         _k.sent();
                         return [2 /*return*/];
                 }

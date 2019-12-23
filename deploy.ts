@@ -1,5 +1,5 @@
 import { spawn, SpawnOptions } from "child_process";
-import { existsSync, writeFile, readFile } from "fs-extra";
+import { existsSync, writeFile, readFile, ensureDir } from "fs-extra";
 import * as glob from "glob";
 import { LZMA } from "lzma-native";
 import * as path from "path";
@@ -274,7 +274,9 @@ class Builder {
         });
         const lzmaSize = lzmaData.byteLength;
         console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
+        await ensureDir(path.dirname(lzmaPath));
         await writeFile(lzmaPath, lzmaData);
+        console.log("Creating version info ...");
         await writeFile(lzmaPath + ".version", EXT_VERSION);
     }
 
