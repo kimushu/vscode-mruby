@@ -34,11 +34,15 @@ class MRubyRepository {
 
     async clone(dir: string): Promise<void> {
         const fullPath = path.resolve(dir);
-        if (!existsSync(fullPath)) {
+        const exists = existsSync(fullPath);
+        if (!exists) {
             await spawnPromise(this.gitCommand,
                 ["clone", this.gitUrl, fullPath]);
         }
         this.clonedDir = fullPath;
+        if (exists) {
+            await this.spawnGit("fetch");
+        }
     }
 
     private spawnGit(...args: string[]): Promise<void> {
@@ -188,6 +192,7 @@ class Builder {
                 console.log(`-------- Skip build (${arch}) --------`);
                 continue;
             }
+            await this.repo.clean();
             await this.build(arch);
             await this.package(arch);
             await this.upload(arch);
@@ -199,7 +204,6 @@ class Builder {
         this.repo = new MRubyRepository();
         await this.repo.clone(path.join(this.workDir, "mruby"));
         await this.repo.checkout(this.mrubyVersion);
-        await this.repo.clean();
     }
 
     async isDone(arch: MRubyArch): Promise<boolean> {
