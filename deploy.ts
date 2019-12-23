@@ -1,5 +1,5 @@
 import { spawn, SpawnOptions } from "child_process";
-import { existsSync, writeFile, readFile, createWriteStream } from "fs-extra";
+import { existsSync, writeFile, readFile } from "fs-extra";
 import * as glob from "glob";
 import { LZMA } from "lzma-native";
 import * as path from "path";
@@ -94,7 +94,7 @@ class Uploader {
         }
     }
 
-    async upload(files: string[]): Promise<void> {
+    async upload(files: string[], remoteDir?: string): Promise<void> {
         const client = new ssh2.Client();
         const connection = new Promise((resolve, reject) => {
             client.on("ready", resolve);
@@ -106,11 +106,30 @@ class Uploader {
             username: this.user,
             privateKey: await readFile(this.identity)
         });
+        console.log("Connecting to server ...");
         await connection;
-        const sftp = promisify(client.sftp).call(client) as ssh2.SFTPWrapper;
-        const fastPut = promisify(sftp.fastPut).bind(sftp);
-        for (let file of files) {
-            await fastPut(file, `${this.dest}/${path.basename(file)}`);
+        try {
+            console.log("Starting SFTP session ...");
+            const sftp = await promisify(client.sftp).call(client) as ssh2.SFTPWrapper;
+            if (remoteDir) {
+                remoteDir = `${this.dest}/${remoteDir}`;
+            } else {
+                remoteDir = this.dest;
+            }
+            console.log(`Making remote directory ...`);
+            try {
+                await promisify(sftp.mkdir).call(sftp, {mode: 0o777}, remoteDir);
+            } catch {
+                // Ignore errors on mkdir
+            }
+            const fastPut = promisify(sftp.fastPut).bind(sftp);
+            for (let file of files) {
+                console.log(`Uploading ${file} ...`);
+                await fastPut(file, `${remoteDir}/${path.basename(file)}`);
+            }
+        } finally {
+            console.log("Closing ...");
+            client.end();
         }
     }
 }
@@ -266,7 +285,7 @@ class Builder {
         console.log(`-------- Uploading archive (${arch}) --------`);
         const lzmaPath = this.getLzmaPath(arch);
         const verPath = lzmaPath + ".version";
-        await this.uploader.upload([lzmaPath, verPath]);
+        await this.uploader.upload([lzmaPath, verPath], this.mrubyVersion);
     }
 
     private getLzmaPath(arch: MRubyArch): string {

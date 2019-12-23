@@ -137,11 +137,11 @@ var Uploader = /** @class */ (function () {
             throw new Error("SFTP_DEST required");
         }
     }
-    Uploader.prototype.upload = function (files) {
+    Uploader.prototype.upload = function (files, remoteDir) {
         return __awaiter(this, void 0, void 0, function () {
-            var client, connection, _a, _b, _c, sftp, fastPut, _i, files_1, file;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var client, connection, _a, _b, _c, sftp, _d, fastPut, _i, files_1, file;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0:
                         client = new ssh2.Client();
                         connection = new Promise(function (resolve, reject) {
@@ -156,26 +156,57 @@ var Uploader = /** @class */ (function () {
                         };
                         return [4 /*yield*/, fs_extra_1.readFile(this.identity)];
                     case 1:
-                        _b.apply(_a, [(_c.privateKey = _d.sent(),
+                        _b.apply(_a, [(_c.privateKey = _e.sent(),
                                 _c)]);
+                        console.log("Connecting to server ...");
                         return [4 /*yield*/, connection];
                     case 2:
-                        _d.sent();
-                        sftp = util_1.promisify(client.sftp).call(client);
+                        _e.sent();
+                        _e.label = 3;
+                    case 3:
+                        _e.trys.push([3, , 13, 14]);
+                        console.log("Starting SFTP session ...");
+                        return [4 /*yield*/, util_1.promisify(client.sftp).call(client)];
+                    case 4:
+                        sftp = _e.sent();
+                        if (remoteDir) {
+                            remoteDir = this.dest + "/" + remoteDir;
+                        }
+                        else {
+                            remoteDir = this.dest;
+                        }
+                        console.log("Making remote directory ...");
+                        _e.label = 5;
+                    case 5:
+                        _e.trys.push([5, 7, , 8]);
+                        return [4 /*yield*/, util_1.promisify(sftp.mkdir).call(sftp, { mode: 511 }, remoteDir)];
+                    case 6:
+                        _e.sent();
+                        return [3 /*break*/, 8];
+                    case 7:
+                        _d = _e.sent();
+                        return [3 /*break*/, 8];
+                    case 8:
                         fastPut = util_1.promisify(sftp.fastPut).bind(sftp);
                         _i = 0, files_1 = files;
-                        _d.label = 3;
-                    case 3:
-                        if (!(_i < files_1.length)) return [3 /*break*/, 6];
+                        _e.label = 9;
+                    case 9:
+                        if (!(_i < files_1.length)) return [3 /*break*/, 12];
                         file = files_1[_i];
-                        return [4 /*yield*/, fastPut(file, this.dest + "/" + path.basename(file))];
-                    case 4:
-                        _d.sent();
-                        _d.label = 5;
-                    case 5:
+                        console.log("Uploading " + file + " ...");
+                        return [4 /*yield*/, fastPut(file, remoteDir + "/" + path.basename(file))];
+                    case 10:
+                        _e.sent();
+                        _e.label = 11;
+                    case 11:
                         _i++;
-                        return [3 /*break*/, 3];
-                    case 6: return [2 /*return*/];
+                        return [3 /*break*/, 9];
+                    case 12: return [3 /*break*/, 14];
+                    case 13:
+                        console.log("Closing ...");
+                        client.end();
+                        return [7 /*endfinally*/];
+                    case 14: return [2 /*return*/];
                 }
             });
         });
@@ -443,7 +474,7 @@ var Builder = /** @class */ (function () {
                         console.log("-------- Uploading archive (" + arch + ") --------");
                         lzmaPath = this.getLzmaPath(arch);
                         verPath = lzmaPath + ".version";
-                        return [4 /*yield*/, this.uploader.upload([lzmaPath, verPath])];
+                        return [4 /*yield*/, this.uploader.upload([lzmaPath, verPath], this.mrubyVersion)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
