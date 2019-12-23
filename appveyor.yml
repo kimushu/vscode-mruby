@@ -3,6 +3,19 @@ image: Visual Studio 2015
 
 environment:
   MRUBY_PLATFORM: win32
+  SFTP_HOST:
+    secure: YHpE1ic0QlIBvAXdCwjLLpo/3fhSyDVXSpn6RFg+QnI=
+  SFTP_PORT:
+    secure: 98aae/Sddmh3TUDrLygfAg==
+  SFTP_USER:
+    secure: Y5L0vjXCK+0dfiPukeg9gQ==
+  SFTP_DEST:
+    secure: CROvShZ3CWt6W1lRADyq0A==
+  SFTP_IDENTITY: id_rsa.uploader
+  ENC_KEY:
+    secure: WgnXNx0FV1BZjJhPLzWLg0nX4VJnCPEIPT0B530Xhm7SkQ+7MiSHOPGYiKeVrlnE/rny1jp1IbBBRUTOjfgFZ21h9eCiJIgyRA9WPxjPIe4=
+  ENC_IV:
+    secure: jWTt/wb7DSBnpgs0UdUEE+I/GUcF2r6kHG1gewzVy+k16VqRd2mkdLMJcT92NHDt
   matrix:
   -
     MRUBY_VERSION: 1.4.1
@@ -29,9 +42,16 @@ environment:
     MRUBY_ARCH: ia32
     MRUBY_ARCH_WIN: x86
 
+cache:
+- node_modules
+
 build_script:
 - cmd: >-
+    openssl aes-256-cbc -K %ENC_KEY% -iv %ENV_IV% -in %SFTP_IDENTITY%.enc -out %SFTP_IDENTITY% -d
+
     set PATH=%PATH%;C:\msys64\usr\bin
+
+    set NODE_OPTIONS=--max-old-space-size=1024
 
     call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %MRUBY_ARCH_WIN%
 
