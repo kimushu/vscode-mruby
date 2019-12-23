@@ -7,10 +7,8 @@ environment:
     secure: YHpE1ic0QlIBvAXdCwjLLpo/3fhSyDVXSpn6RFg+QnI=
   SFTP_PORT:
     secure: 98aae/Sddmh3TUDrLygfAg==
-  SFTP_USER:
-    secure: Y5L0vjXCK+0dfiPukeg9gQ==
-  SFTP_DEST:
-    secure: CROvShZ3CWt6W1lRADyq0A==
+  SFTP_USER: uploader
+  SFTP_DEST: /recv
   SFTP_IDENTITY: id_rsa.uploader
   ENC_KEY:
     secure: WgnXNx0FV1BZjJhPLzWLg0nX4VJnCPEIPT0B530Xhm7SkQ+7MiSHOPGYiKeVrlnE/rny1jp1IbBBRUTOjfgFZ21h9eCiJIgyRA9WPxjPIe4=
