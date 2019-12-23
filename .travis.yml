@@ -35,4 +35,5 @@ before_script:
 
 script:
 - npm install
+- npm run compile
 - node deploy.js

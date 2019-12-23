@@ -1,3 +1,4 @@
 /mruby
 /id_rsa*
 /node_modules
+/*.js
