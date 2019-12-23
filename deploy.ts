@@ -118,7 +118,7 @@ class Uploader {
             }
             console.log(`Making remote directory ...`);
             try {
-                await promisify(sftp.mkdir).call(sftp, {mode: 0o777}, remoteDir);
+                await promisify(sftp.mkdir).call(sftp, remoteDir);
             } catch {
                 // Ignore errors on mkdir
             }
