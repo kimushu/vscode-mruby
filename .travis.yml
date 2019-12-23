@@ -30,7 +30,7 @@ addons:
     - lib32ncurses5-dev
 
 before_script:
-- openssl enc -aes-256-cbc -in $SFTP_IDENTITY.enc -out $SFTP_IDENTITY -d -K $ENC_KEY -iv $ENV_IV
+- openssl enc -aes-256-cbc -in $SFTP_IDENTITY.enc -out $SFTP_IDENTITY -d -K $ENC_KEY -iv $ENC_IV
 - chmod 600 $SFTP_IDENTITY
 
 script:
