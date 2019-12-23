@@ -8,6 +8,7 @@ os:
 env:
   jobs:
   - MRUBY_VERSION=1.4.1
+  - MRUBY_VERSION=2.0.0
   - MRUBY_VERSION=2.0.1
   - MRUBY_VERSION=2.1.0
   global:

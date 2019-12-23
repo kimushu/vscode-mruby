@@ -24,6 +24,14 @@ environment:
     MRUBY_ARCH: ia32
     MRUBY_ARCH_WIN: x86
   -
+    MRUBY_VERSION: 2.0.0
+    MRUBY_ARCH: x64
+    MRUBY_ARCH_WIN: amd64
+  -
+    MRUBY_VERSION: 2.0.0
+    MRUBY_ARCH: ia32
+    MRUBY_ARCH_WIN: x86
+  -
     MRUBY_VERSION: 2.0.1
     MRUBY_ARCH: x64
     MRUBY_ARCH_WIN: amd64
