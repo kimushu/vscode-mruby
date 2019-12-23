@@ -23,6 +23,9 @@
   },
   "scripts": {
     "compile": "tsc -p .",
-    "watch": "tsc -w -p ."
+    "watch": "tsc -w -p .",
+    "deploy": "node deploy.js",
+    "predeploy": "npm run compile",
+    "precompile": "npm install"
   }
 }

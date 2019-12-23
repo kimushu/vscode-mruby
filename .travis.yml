@@ -34,6 +34,4 @@ before_script:
 - chmod 600 $SFTP_IDENTITY
 
 script:
-- npm install
-- npm run compile
-- node deploy.js
+- npm run deploy
