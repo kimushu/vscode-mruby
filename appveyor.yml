@@ -47,7 +47,7 @@ cache:
 
 build_script:
 - cmd: >-
-    openssl aes-256-cbc -K %ENC_KEY% -iv %ENV_IV% -in %SFTP_IDENTITY%.enc -out %SFTP_IDENTITY% -d
+    openssl enc -aes-256-cbc -K %ENC_KEY% -iv %ENV_IV% -in %SFTP_IDENTITY%.enc -out %SFTP_IDENTITY% -d
 
     set PATH=%PATH%;C:\msys64\usr\bin
 
