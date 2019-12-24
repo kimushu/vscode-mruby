@@ -272,7 +272,7 @@ class Builder {
         tarPack.finalize();
         const tarSize = tarBuffer.size();
         const lzmaPath = this.getLzmaPath(arch);
-        const lzmaData = await new Promise<Buffer>((resolve, reject) => {
+        const lzmaData = await new Promise<Buffer>((resolve) => {
             console.log(`Compressing to ${lzmaPath} ...`);
             const content = tarBuffer.getContents() as Buffer;
             try {
@@ -283,7 +283,7 @@ class Builder {
             }
         });
         const lzmaSize = lzmaData.byteLength;
-        if (lzmaSize != tarSize) {
+        if (lzmaSize !== tarSize) {
             console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
         }
         await ensureDir(path.dirname(lzmaPath));
