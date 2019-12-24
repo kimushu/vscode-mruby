@@ -1,7 +1,6 @@
 import { spawn, SpawnOptions } from "child_process";
 import { existsSync, writeFile, readFile, ensureDir } from "fs-extra";
 import * as glob from "glob";
-import * as lzma from "lzma";
 import { LZMA } from "lzma-native";
 import * as path from "path";
 import { SemVer } from "semver";
@@ -279,14 +278,14 @@ class Builder {
             try {
                 LZMA().compress(content, 9, resolve);
             } catch {
-                console.log("Falling back to LZMA-js. This may take a while...");
-                lzma.compress(content, 9, (result: Buffer, error?: Error) => {
-                    error ? reject(error) : resolve(result);
-                });
+                console.log("Failed. Fallback to uncompressed output");
+                resolve(content);
             }
         });
         const lzmaSize = lzmaData.byteLength;
-        console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
+        if (lzmaSize != tarSize) {
+            console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
+        }
         await ensureDir(path.dirname(lzmaPath));
         await writeFile(lzmaPath, lzmaData);
         console.log("Creating version info ...");
