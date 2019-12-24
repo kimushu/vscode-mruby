@@ -1,6 +1,7 @@
 import { spawn, SpawnOptions } from "child_process";
 import { existsSync, writeFile, readFile, ensureDir } from "fs-extra";
 import * as glob from "glob";
+import * as lzma from "lzma";
 import { LZMA } from "lzma-native";
 import * as path from "path";
 import { SemVer } from "semver";
@@ -272,9 +273,17 @@ class Builder {
         tarPack.finalize();
         const tarSize = tarBuffer.size();
         const lzmaPath = this.getLzmaPath(arch);
-        const lzmaData = await new Promise<Buffer>((resolve) => {
+        const lzmaData = await new Promise<Buffer>((resolve, reject) => {
             console.log(`Compressing to ${lzmaPath} ...`);
-            LZMA().compress(tarBuffer.getContents() as Buffer, 9, resolve);
+            const content = tarBuffer.getContents() as Buffer;
+            try {
+                LZMA().compress(content, 9, resolve);
+            } catch {
+                console.log("Falling back to LZMA-js. This may take a while...");
+                lzma.compress(content, 9, (result: Buffer, error?: Error) => {
+                    error ? reject(error) : resolve(result);
+                });
+            }
         });
         const lzmaSize = lzmaData.byteLength;
         console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
