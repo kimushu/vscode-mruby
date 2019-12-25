@@ -25,9 +25,9 @@
   "scripts": {
     "compile": "tsc -p .",
     "watch": "tsc -w -p .",
-    "deploy": "node deploy.js",
-    "predeploy": "npm run compile",
-    "precompile": "npm install",
+    "start": "node deploy.js",
+    "prestart": "yarn run compile",
+    "precompile": "yarn install",
     "check": "node lzma-check.js"
   }
 }
