@@ -272,22 +272,22 @@ class Builder {
         tarPack.finalize();
         const tarSize = tarBuffer.size();
         const lzmaPath = this.getLzmaPath(arch);
-        const lzmaData = await new Promise<Buffer>((resolve) => {
+        const [ packPath, packData ] = await new Promise<[string, Buffer]>((resolve) => {
             console.log(`Compressing to ${lzmaPath} ...`);
             const content = tarBuffer.getContents() as Buffer;
             try {
-                LZMA().compress(content, 9, resolve);
+                LZMA().compress(content, 9, (result) => {
+                    const lzmaSize = result.byteLength;
+                    console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
+                    resolve([lzmaPath, content]);
+                });
             } catch {
                 console.log("Failed. Fallback to uncompressed output");
-                resolve(content);
+                resolve([lzmaPath.replace(/\.lzma$/, ""), content]);
             }
         });
-        const lzmaSize = lzmaData.byteLength;
-        if (lzmaSize !== tarSize) {
-            console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
-        }
-        await ensureDir(path.dirname(lzmaPath));
-        await writeFile(lzmaPath, lzmaData);
+        await ensureDir(path.dirname(packPath));
+        await writeFile(packPath, packData);
         console.log("Creating version info ...");
         await writeFile(lzmaPath + ".version", EXT_VERSION);
     }
@@ -299,7 +299,11 @@ class Builder {
         console.log(`-------- Uploading archive (${arch}) --------`);
         const lzmaPath = this.getLzmaPath(arch);
         const verPath = lzmaPath + ".version";
-        await this.uploader.upload([lzmaPath, verPath], this.mrubyVersion);
+        let packPath = lzmaPath;
+        if (!existsSync(lzmaPath)) {
+            packPath = lzmaPath.replace(/\.lzma$/, "");
+        }
+        await this.uploader.upload([packPath, verPath], this.mrubyVersion);
     }
 
     private getLzmaPath(arch: MRubyArch): string {
