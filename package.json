@@ -26,8 +26,8 @@
     "compile": "tsc -p .",
     "watch": "tsc -w -p .",
     "start": "node deploy.js",
-    "prestart": "yarn run compile",
-    "precompile": "yarn install",
+    "prestart": "npm run compile",
+    "precompile": "npm install",
     "check": "node lzma-check.js"
   }
 }
