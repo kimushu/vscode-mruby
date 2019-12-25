@@ -248,7 +248,7 @@ class Builder {
                 }
                 console.log(`Adding ${fullName} ...`);
                 const content = await readFile(binPath);
-                tarPack.entry({name: `${prefix}/${fullName}`}, content);
+                tarPack.entry({name: `${prefix}/${fullName}`, mode: 0o755}, content);
             }
         }
         console.log("Adding version info ...");

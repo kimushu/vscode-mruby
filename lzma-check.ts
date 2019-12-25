@@ -36,7 +36,8 @@ async function main() {
                     });
                     temp.on("close", () => {
                         execFile("file", ["-b", tempName], (_, stdout) => {
-                            console.log(` => ${headers.name}: ${stdout.trim()}`);
+                            const { name, mode } = headers;
+                            console.log(` => ${name}:${mode?.toString(8)}:${stdout.trim()}`);
                             unlinkSync(tempName);
                             next();
                         });
