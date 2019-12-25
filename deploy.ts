@@ -279,7 +279,7 @@ class Builder {
                 LZMA().compress(content, 9, (result) => {
                     const lzmaSize = result.byteLength;
                     console.log(`Compressed ${tarSize} -> ${lzmaSize} bytes`);
-                    resolve([lzmaPath, content]);
+                    resolve([lzmaPath, result]);
                 });
             } catch {
                 console.log("Failed. Fallback to uncompressed output");
