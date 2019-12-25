@@ -194,8 +194,8 @@ class Builder {
             }
             await this.repo.clean();
             await this.build(arch);
-            await this.package(arch);
-            await this.upload(arch);
+            const artifacts = await this.package(arch);
+            await this.upload(arch, artifacts);
         }
     }
 
@@ -231,7 +231,7 @@ class Builder {
         });
     }
 
-    async package(arch: MRubyArch): Promise<void> {
+    async package(arch: MRubyArch): Promise<string[]> {
         console.log(`-------- Packaging files (${arch}) --------`);
         const buildPath = path.join(this.repo.dir, "build");
         const tarPack = tarStream.pack();
@@ -289,21 +289,17 @@ class Builder {
         await ensureDir(path.dirname(packPath));
         await writeFile(packPath, packData);
         console.log("Creating version info ...");
-        await writeFile(lzmaPath + ".version", EXT_VERSION);
+        const verPath = lzmaPath + ".version";
+        await writeFile(verPath, EXT_VERSION);
+        return [packPath, verPath];
     }
 
-    async upload(arch: MRubyArch): Promise<void> {
+    async upload(arch: MRubyArch, artifacts: string[]): Promise<void> {
         if (!this.uploader) {
             return;
         }
         console.log(`-------- Uploading archive (${arch}) --------`);
-        const lzmaPath = this.getLzmaPath(arch);
-        const verPath = lzmaPath + ".version";
-        let packPath = lzmaPath;
-        if (!existsSync(lzmaPath)) {
-            packPath = lzmaPath.replace(/\.lzma$/, "");
-        }
-        await this.uploader.upload([packPath, verPath], this.mrubyVersion);
+        await this.uploader.upload(artifacts, this.mrubyVersion);
     }
 
     private getLzmaPath(arch: MRubyArch): string {
